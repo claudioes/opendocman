@@ -1,0 +1,10 @@
+.DS_Store
+.svn
+._*
+~$*
+.*.swp
+Thumbs.db
+/nbproject
+config.php
+/vendor/
+/templates_c/
