@@ -174,9 +174,9 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
 									<label class="checkbox">
 										<input type="checkbox" style="margin-top:0;" name="search_exact_phrase" <?php echo $search_exact_phrase ? 'checked' : '' ?>> <?php echo msg('label_exact_phrase') ?>
 									</label>
-									
+
                                     <br>
-									
+
 									<button class="btn" type="submit" name="submit">
 										<?php echo msg('search'); ?>
 									</button>
@@ -211,31 +211,31 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
 
         if ($search_descriptions) {
             $where[] = "d.description LIKE :description";
-			
+
 			if (!$search_exact_phrase) {
 				$search_descriptions = "%$search_descriptions%";
 			}
-			
+
             $params['description'] = $search_descriptions;
         }
 
         if ($search_realname) {
             $where[] = "d.realname LIKE :realname";
-			
+
 			if (!$search_exact_phrase) {
 				$search_realname = "%$search_realname%";
 			}
-			
+
             $params['realname'] = $search_realname;
         }
 
         if ($search_comments) {
             $where[] = "d.comment LIKE :comment";
-			
+
 			if (!$search_exact_phrase) {
 				$search_comments = "%$search_comments%";
 			}
-			
+
             $params['comment'] = $search_comments;
         }
 
@@ -258,18 +258,22 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
         //$udf_array = array_filter($_GET, function ($value) {
         //    return false !== strpos($value, 'udftbl_');
         //}, ARRAY_FILTER_USE_KEY);
-		
+
 		$udf_array = [];
 		foreach($_GET as $key => $value) {
 			if (strpos($key, 'udftbl_')) {
 				$udf_array[$key] = $value;
 			}
 		}
-		
+
         foreach($udf_array as $key => $value) {
             if($value) {
-                $where[] = "$key = :{$key}";
-                $params[$key] = $value;
+                if (is_array($value)) {
+                    $where[] = "EXISTS (SELECT 1 FROM {$key}_data WHERE {$key}_data.udf_id in (" . join(', ', $value) . ") AND {$key}_data.data_id = d.id)";
+                } else {
+                    $where[] = "$key = :{$key}";
+                    $params[$key] = $value;
+                }
             }
         }
 
@@ -285,6 +289,8 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
             $query .= ' ORDER BY d.id ASC';
         }
 
+        //echo $query;
+        
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         $result = $stmt->fetchAll();

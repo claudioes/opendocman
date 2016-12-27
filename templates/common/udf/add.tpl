@@ -15,6 +15,7 @@
                     <option value=4>{$g_lang_label_sub_select_list}</option>
                     <option value=2>{$g_lang_label_radio_button}</option>
                     <option value=3>{$g_lang_label_text}</option>
+                    <option value=5>{$g_lang_label_checkbox}</option>
                 </select>
             </td>
         </tr>

@@ -95,6 +95,24 @@ if (!defined('udf_functions')) {
                 }
             }
 
+            // Type is checkbox
+            if ($row[1] == 5) {
+                $query = "
+                  SELECT
+                    id,
+                    value
+                  FROM
+                    {$row[0]}
+                ";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+                $sub_result = $stmt->fetchAll();
+
+                foreach ($sub_result as $sub_row) {
+                    echo '<label class="checkbox"><input type="checkbox" style="margin-top:0;" name="'. e::h($row[0]) .'[]" value="'. e::h($sub_row[0]) .'">'. e::h($sub_row[1]) . '</label>';
+                }
+            }
+
             // Type is Text
             if ($row[1] == 3) {
                 echo '<input type="Text" name="'. e::h($row[0]) .'" size="16">';
@@ -130,59 +148,90 @@ if (!defined('udf_functions')) {
     {
         global $pdo;
 
+        $prefix = $GLOBALS['CONFIG']['db_prefix'];
+
         $query = "
-          SELECT
-            table_name,
-            field_type
-          FROM
-            {$GLOBALS['CONFIG']['db_prefix']}udf
-          ORDER BY
-            id
+            SELECT
+                table_name,
+                field_type
+            FROM
+                {$prefix}udf
+            ORDER BY
+                id
         ";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $result = $stmt->fetchAll();
 
-        $i = 0; //CHM
         foreach ($result as $row) {
-            if ($row[1] == 1 || $row[1] == 2 || $row[1] == 3 || $row[1] == 4) { //CHM
-                if (isset($_REQUEST[$row[0]]) && $_REQUEST[$row[0]] != "") {
-                    $explode_row = explode('_', $row[0]);
-                    $field_name = $explode_row[2];
+            $table_name = $row[0];
 
+            if (isset($_REQUEST[$table_name]) && $_REQUEST[$table_name]) {
+                if ($row[1] == 5) {
+                    // Checkbox
                     $query = "
-                      UPDATE
-                        {$GLOBALS['CONFIG']['db_prefix']}data
-                      SET
-                        `{$row['0']}` = :row_value
-                      WHERE
-                        id = :file_id
+                        DELETE FROM {$table_name}_data
+                        WHERE data_id = :file
                     ";
                     $stmt = $pdo->prepare($query);
                     $stmt->execute(array(
-                        ':row_value' => $_REQUEST[$row['0']],
+                        ':file' => $fileId
+                    ));
+
+                    $query = "
+                        INSERT INTO {$table_name}_data (udf_id, data_id)
+                        VALUES (:udf, :file)
+                    ";
+                    $stmt = $pdo->prepare($query);
+
+                    foreach($_REQUEST[$table_name] as $value) {
+                        $stmt->execute(array(
+                            ':udf'  => $value,
+                            ':file' => $fileId
+                        ));
+                    }
+                } else {
+                    $value = $_REQUEST[$table_name];
+
+                    // Textbox, select, sublist
+                    $query = "
+                        UPDATE
+                            {$prefix}data
+                        SET
+                            `{$table_name}` = :row_value
+                        WHERE
+                            id = :file_id
+                    ";
+                    $stmt = $pdo->prepare($query);
+                    $stmt->execute(array(
+                        ':row_value' => $value,
                         ':file_id' => $fileId
                     ));
 
                     //CHM
-                    if (isset($_REQUEST['tablename' . $i]) && $_REQUEST['tablename' . $i] != '' && $row[1] == 4) {
-                        $secondary_value = intval($_REQUEST[ "{$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary" ]);
-                        $query = "
-                          UPDATE
-                            {$GLOBALS['CONFIG']['db_prefix']}data
-                          SET
-                            {$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary = :secondary_value
-                          WHERE
-                            id = :file_id
-                        ";
-                        $stmt = $pdo->prepare($query);
-                        $stmt->execute(array(
-                            ':secondary_value' => $secondary_value,
-                            ':file_id' => $fileId
-                        ));
-                        $i++;
+                    if ($row[1] == 4) {
+                        // Subselect
+                        $table_name_secondary = str_replace('primary', 'secondary', $table_name);
+
+                        if(isset($_REQUEST[$table_name_secondary])) {
+                            $secondary_value = $_REQUEST[$table_name_secondary];
+
+                            $query = "
+                                UPDATE
+                                    {$prefix}data
+                                SET
+                                    {$table_name_secondary} = :secondary_value
+                                WHERE
+                                    id = :file_id
+                            ";
+
+                            $stmt = $pdo->prepare($query);
+                            $stmt->execute(array(
+                                ':secondary_value' => $secondary_value,
+                                ':file_id' => $fileId
+                            ));
+                        }
                     }
-                    //CHM
                 }
             }
         }
@@ -207,7 +256,7 @@ if (!defined('udf_functions')) {
         $result = $stmt->fetchAll();
 
         foreach ($result as $row) {
-            if ($row[1] == 1 || $row[1] == 2) {
+            if (in_array($row[1], [1, 2])) {
                 echo '<div class="control-group">';
                 echo '<label class="control-label">' .  e::h($row[0]) . '</label>';
                 echo '<div class="controls">';
@@ -272,15 +321,45 @@ if (!defined('udf_functions')) {
                   WHERE
                     id = :id
                 ";
+
                 $stmt = $pdo->prepare($query);
+
                 $stmt->execute(array(':id' => $_REQUEST['id']));
                 $sub_row = $stmt->fetch();
 
                 echo '<input type="text" name="' . e::h($row[2]) . '" size="50" value="' . e::h($sub_row[0]) . '">';
                 echo '</div></div>';
-            }
-            //CHM
-            elseif ($row[1] == 4) {
+            } elseif ($row[1] == 5) {
+                echo '<div class="control-group">';
+                echo '<label class="control-label">' . e::h($row[0]) . '</label>';
+                echo '<div class="controls">';
+
+                $query = "
+                    SELECT
+                        u.id, u.value, CASE WHEN d.data_id IS NULL THEN 0 ELSE 1 END AS checked
+                    FROM
+                        {$row['2']} u
+                    LEFT JOIN
+                        {$row['2']}_data d ON d.udf_id = u.id AND d.data_id = :id
+                    ORDER BY
+                        u.id
+                ";
+
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array(':id' => $_REQUEST['id']));
+                $sub_result = $stmt->fetchAll();
+
+                foreach ($sub_result as $sub_row) {
+                    echo '<label class="checkbox">';
+                    echo '<input type="checkbox" style="margin-top:0;" name="'. e::h($row[2]) .'[]"';
+                    echo 'value="'. e::h($sub_row[0]) .'"';
+                    echo ($sub_row[2] ? 'checked' : '') . '>';
+                    echo e::h($sub_row[1]);
+                    echo '</label>';
+                }
+
+                echo '</div></div>';
+            } elseif ($row[1] == 4) {
                 $explode_row = explode('_', $row[2]);
                 $field_name = $explode_row[2];
 
@@ -371,67 +450,67 @@ if (!defined('udf_functions')) {
         }
     }
 
-    function udf_edit_file_update()
-    {
-        global $pdo;
-
-        $query = "
-          SELECT
-            display_name,
-            field_type,
-            table_name
-          FROM
-            {$GLOBALS['CONFIG']['db_prefix']}udf
-          ORDER BY
-          id
-        ";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-
-        $i = 0; //CHM
-        foreach ($result as $row) {
-            if ($row[1] == 1 || $row[1] == 2 || $row[1] == 3 || $row[1] == 4) { //CHM sub select option 4 added
-                if (isset($_REQUEST[$row[2]]) && $_REQUEST[$row[2]] != "") {
-                    $query = "
-                      UPDATE
-                        {$GLOBALS['CONFIG']['db_prefix']}data
-                      SET
-                        `{$row['2']}` = :row2
-                      WHERE
-                        id = :id
-                    ";
-                    $stmt = $pdo->prepare($query);
-                    $stmt->execute(array(
-                        ':id' => $_REQUEST['id'],
-                        ':row2' => $_REQUEST[$row['2']]
-                    ));
-
-                    //CHM secondary values
-                    if ((isset($_REQUEST['tablename' . $i]) && $_REQUEST['tablename' . $i] != '') && $row[1] == 4) {
-                        $explode_row = explode('_', $row[2]);
-                        $field_name = $explode_row[2];
-                        $secondary_value = intval($_REQUEST[ "{$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary" ]);
-                        $query = "
-                          UPDATE
-                            {$GLOBALS['CONFIG']['db_prefix']}data
-                          SET
-                            `{$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary`= :secondary_value
-                          WHERE
-                            id = :id
-                        ";
-                        $stmt = $pdo->prepare($query);
-                        $stmt->execute(array(
-                            ':secondary_value' => $secondary_value,
-                            ':id' => $_REQUEST['id']
-                        ));
-
-                        $i++;
-                    }
-                }
-            }
-        }
-    }
+    // function udf_edit_file_update()
+    // {
+    //     global $pdo;
+    //
+    //     $query = "
+    //       SELECT
+    //         display_name,
+    //         field_type,
+    //         table_name
+    //       FROM
+    //         {$GLOBALS['CONFIG']['db_prefix']}udf
+    //       ORDER BY
+    //       id
+    //     ";
+    //     $stmt = $pdo->prepare($query);
+    //     $stmt->execute();
+    //     $result = $stmt->fetchAll();
+    //
+    //     $i = 0; //CHM
+    //     foreach ($result as $row) {
+    //         if ($row[1] == 1 || $row[1] == 2 || $row[1] == 3 || $row[1] == 4) { //CHM sub select option 4 added
+    //             if (isset($_REQUEST[$row[2]]) && $_REQUEST[$row[2]] != "") {
+    //                 $query = "
+    //                   UPDATE
+    //                     {$GLOBALS['CONFIG']['db_prefix']}data
+    //                   SET
+    //                     `{$row['2']}` = :row2
+    //                   WHERE
+    //                     id = :id
+    //                 ";
+    //                 $stmt = $pdo->prepare($query);
+    //                 $stmt->execute(array(
+    //                     ':id' => $_REQUEST['id'],
+    //                     ':row2' => $_REQUEST[$row['2']]
+    //                 ));
+    //
+    //                 //CHM secondary values
+    //                 if ((isset($_REQUEST['tablename' . $i]) && $_REQUEST['tablename' . $i] != '') && $row[1] == 4) {
+    //                     $explode_row = explode('_', $row[2]);
+    //                     $field_name = $explode_row[2];
+    //                     $secondary_value = intval($_REQUEST[ "{$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary" ]);
+    //                     $query = "
+    //                       UPDATE
+    //                         {$GLOBALS['CONFIG']['db_prefix']}data
+    //                       SET
+    //                         `{$GLOBALS['CONFIG']['db_prefix']}udftbl_{$field_name}_secondary`= :secondary_value
+    //                       WHERE
+    //                         id = :id
+    //                     ";
+    //                     $stmt = $pdo->prepare($query);
+    //                     $stmt->execute(array(
+    //                         ':secondary_value' => $secondary_value,
+    //                         ':id' => $_REQUEST['id']
+    //                     ));
+    //
+    //                     $i++;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     /**
      * Generate the UDF details display
@@ -481,6 +560,31 @@ if (!defined('udf_functions')) {
                 }
             }
             //CHM
+            elseif ($row[1] == 5) {
+                $query = "
+                    SELECT
+                        u.value
+                    FROM
+                        {$row['2']} u
+                    LEFT JOIN
+                        {$row['2']}_data d ON d.udf_id = u.id
+                    WHERE
+                        d.data_id = :file_id
+                    ORDER BY
+                        u.id
+                ";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array(':file_id' => $fileId));
+
+                $values = [];
+                foreach($stmt->fetchAll() as $sub_row) {
+                    $values[] = '<span class="label">' . e::h($sub_row[0]) . '</span>';
+                }
+
+                if ($stmt->rowCount() > 0) {
+                    $return_string .= '<td class="title">' . e::h($row[0]) . ':</td><td>' . implode(' ', $values) . '</td></tr>';
+                }
+            }
         }
         return $return_string;
     }
@@ -599,7 +703,7 @@ if (!defined('udf_functions')) {
         $stmt->execute(array(':table_name' => $table_name));
 
         if ($stmt->rowCount() == 0) {
-            if ($_REQUEST['field_type'] == 1 || $_REQUEST['field_type'] == 2) {
+            if (in_array($_REQUEST['field_type'], [1, 2])) {
                 // They have chosen Select list of Radio list
                 //
                 // First we add a new column in the data table
@@ -756,7 +860,7 @@ if (!defined('udf_functions')) {
                 }
             } elseif ($_REQUEST['field_type'] == 3) {
                 // The have chosen a text field
-                $query = "ALTER TABLE {$GLOBALS['CONFIG']['db_prefix']}data ADD COLUMN {$table_name} varchar(255) AFTER category";
+                $query = "ALTER TABLE {$GLOBALS['CONFIG']['db_prefix']}data ADD COLUMN {$table_name} varchar(255)";
                 $stmt = $pdo->prepare($query);
                 $stmt->execute();
                 if (!$stmt) {
@@ -790,6 +894,45 @@ if (!defined('udf_functions')) {
                     header('Location: admin.php?last_message=Error+:+Problem+With+INSERT');
                     exit;
                 }
+            } elseif ($_REQUEST['field_type'] == 5) {
+                // The have chosen a checkbox
+                $prefix = $GLOBALS['CONFIG']['db_prefix'];
+
+                $query = "
+                    INSERT INTO {$prefix}udf
+                    (
+                        table_name,
+                        display_name,
+                        field_type
+                    ) VALUES (
+                        :table_name,
+                        :display_name,
+                        :field_type
+                    )
+                ";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array(
+                    ':table_name' => $table_name,
+                    ':display_name' => $_REQUEST['display_name'],
+                    ':field_type' => $_REQUEST['field_type']
+                ));
+
+                $query = "
+                    CREATE TABLE $table_name
+                    (id INT AUTO_INCREMENT PRIMARY KEY, value VARCHAR(80))
+                ";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+
+                $query = "
+                    CREATE TABLE {$table_name}_data(
+                        udf_id INT NOT NULL,
+                        data_id INT NOT NULL,
+                        PRIMARY KEY(udf_id, data_id)
+                    )
+                ";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
             }
         } else {
             header('Location: admin.php?last_message=Error+:+Duplicate+Table+Name');
@@ -830,16 +973,21 @@ if (!defined('udf_functions')) {
                 $stmt->execute();
             }
         } else {
-
             $query = "DELETE FROM {$GLOBALS['CONFIG']['db_prefix']}udf WHERE table_name = :id ";
             $stmt = $pdo->prepare($query);
             $stmt->execute(array(
                 ':id' => $request
             ));
 
-            $query = "ALTER TABLE {$GLOBALS['CONFIG']['db_prefix']}data DROP COLUMN $request";
-            $stmt = $pdo->prepare($query);
-            $stmt->execute();
+            if (isset($_REQUEST['type']) && $_REQUEST['type'] == 5) {
+                $query = "DROP TABLE IF EXISTS {$request}_data";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+            } else {
+                $query = "ALTER TABLE {$GLOBALS['CONFIG']['db_prefix']}data DROP COLUMN $request";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+            }
 
             $query = "DROP TABLE IF EXISTS $request";
             $stmt = $pdo->prepare($query);
@@ -853,13 +1001,23 @@ if (!defined('udf_functions')) {
 
         $prefix = $GLOBALS['CONFIG']['db_prefix'];
 
-        $query = "SELECT table_name, display_name, field_type FROM {$prefix}udf ORDER BY id";
+        $query = "SELECT table_name, display_name, field_type FROM `{$prefix}udf` ORDER BY id";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $result = $stmt->fetchAll();
 
         foreach ($result as $row) {
-            $value = filter_input(INPUT_GET, $row[0]);
+            if ($row[2] == 5) {
+                // Checkbox
+                //filter_input no sirve con arrays
+                $value = null;
+                if (isset($_GET[$row[0]])) {
+                    $value = $_GET[$row[0]];
+                }
+            } else {
+                // Textbox, selects
+                $value = filter_input(INPUT_GET, $row[0]);
+            }
             $table = $row[0];
             $display = $row[1];
 
@@ -867,10 +1025,26 @@ if (!defined('udf_functions')) {
 
             if (3 === (int)$row[2]) {
                 echo "<input type=\"text\" name=\"$table\" value=\"$value\">";
-            } else {
+            }
+            else if (5 === (int)$row[2]) {
+                $query = "SELECT id, value FROM `" . strtolower($table) . "` ORDER BY id";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute();
+
+                foreach($stmt->fetchAll() as $row_udf) {
+                    echo '<label class="checkbox">';
+                    echo '<input type="checkbox" style="margin-top:0;" name="' . $table . '[]" value="' . $row_udf[0] . '"';
+                    if ($value) {
+                        echo in_array($row_udf[0], $value) ? "checked" : "";
+                    }
+                    echo ">" . $row_udf[1];
+                    echo '</input></label>';
+                }
+            }
+            else {
                 echo "<select name=\"$table\"><option value=\"\"></option>";
 
-                $query = "SELECT id, value FROM " . strtolower($table) . " ORDER BY id";
+                $query = "SELECT id, value FROM `" . strtolower($table) . "` ORDER BY id";
                 $stmt = $pdo->prepare($query);
                 $stmt->execute();
 
@@ -886,36 +1060,40 @@ if (!defined('udf_functions')) {
         }
     }
 
-    /**
-     * Perform search on UDF fields
-     * @param string $where
-     * @param string $query_pre
-     * @param string $query
-     * @param string $equate
-     * @param string $keyword
-     * @return array
-     */
-    function udf_functions_search($where, $query_pre, $query, $equate, $keyword)
-    {
-        global $pdo;
-
-        $lookup_query = "SELECT table_name,field_type FROM {$GLOBALS['CONFIG']['db_prefix']}udf WHERE display_name = :display_name ";
-        $stmt = $pdo->prepare($lookup_query);
-        $stmt->execute(array(
-            ':display_name' => $where
-        ));
-        $row = $stmt->fetch();
-
-        if ($row[1] == 1 || $row[1] == 2 || $row[1] == 4) {
-            $query_pre .= ', ' . $row[0];
-            $query .= $row[0] . '.value' . $equate . '\'' . $keyword . '\'';
-            $query .= ' AND d.' . $row[0] . ' = ' . $row[0] . '.id';
-        } elseif ($row[1] == 3) {
-            $query .= $row[0] . $equate . '\'' . $keyword . '\'';
-        }
-
-        return array($query_pre,$query);
-    }
+    // /**
+    //  * Perform search on UDF fields
+    //  * @param string $where
+    //  * @param string $query_pre
+    //  * @param string $query
+    //  * @param string $equate
+    //  * @param string $keyword
+    //  * @return array
+    //  */
+    // function udf_functions_search($where, $query_pre, $query, $equate, $keyword)
+    // {
+    //     global $pdo;
+    //
+    //     $lookup_query = "
+    //         SELECT table_name, field_type
+    //         FROM {$GLOBALS['CONFIG']['db_prefix']}udf
+    //         WHERE display_name = :display_name
+    //     ";
+    //     $stmt = $pdo->prepare($lookup_query);
+    //     $stmt->execute(array(
+    //         ':display_name' => $where
+    //     ));
+    //     $row = $stmt->fetch();
+    //
+    //     if (in_array($row[1], [1, 2, 4])) {
+    //         $query_pre .= ', ' . $row[0];
+    //         $query .= $row[0] . '.value' . $equate . '\'' . $keyword . '\'';
+    //         $query .= ' AND d.' . $row[0] . ' = ' . $row[0] . '.id';
+    //     } elseif ($row[1] == 3) {
+    //         $query .= $row[0] . $equate . '\'' . $keyword . '\'';
+    //     }
+    //
+    //     return array($query_pre,$query);
+    // }
 
     /**
      * @param string $name

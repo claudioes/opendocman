@@ -247,7 +247,7 @@ if (!isset($_REQUEST['submit'])) {
     // Update the file with the new values
     $filedata->updateData();
 
-    udf_edit_file_update();
+    udf_add_file_insert($fileId);
 
     // clean out old permissions
     $del_user_perms_query = "DELETE FROM {$GLOBALS['CONFIG']['db_prefix']}user_perms WHERE fid = :file_id";

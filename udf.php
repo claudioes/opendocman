@@ -19,7 +19,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-// check for valid session 
+// check for valid session
 session_start();
 
 include('odm-load.php');
@@ -136,7 +136,7 @@ if (isset($_GET['submit']) && $_GET['submit'] == 'add') {
     $display_name = $result[2];
     $field_type = $result[1];
 
-    if ($field_type == 1 || $field_type == 2) {
+    if (in_array($field_type, [1, 2, 5])) {
         // Do Updates
         if (!empty($_REQUEST['display_name'])) {
             $query = "

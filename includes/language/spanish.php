@@ -226,6 +226,7 @@ $lang['label_size'] = 'Tamaño';
 $lang['label_specific_permissions'] = 'Permisos Específicos del Usuario';
 $lang['label_status'] = 'Estado';
 $lang['label_text'] = 'Texto';
+$lang['label_checkbox'] = 'Seleccion múltiple';
 $lang['label_update'] = 'Actualizar';
 $lang['label_user'] = 'Usuario';
 $lang['label_user_defined_field'] = 'Campos a Definidos por Usuario';
