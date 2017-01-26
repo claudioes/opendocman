@@ -28,19 +28,19 @@
 class AccessLog extends Plugin
 {
     public $accesslog='';
-    
+
     /**
      * AccessLog constructor for the AccessLog plugin
      * @param string $_accesslog Message to display
      */
-    public function AccessLog($_accesslog='')
+    public function __construct($_accesslog='')
     {
         $this->name = 'AccessLog';
         $this->author = 'Stephen Lawrence Jr';
         $this->version = '1.0';
         $this->homepage = 'http://www.opendocman.com';
         $this->description = 'AccessLog Plugin for OpenDocMan';
-        
+
         $this->accesslog = $_accesslog;
     }
 
@@ -60,7 +60,7 @@ class AccessLog extends Plugin
         $var = $this->accesslog;
         return $var;
     }
-    
+
     /**
      * Draw the admin menu
      * Required if you want an admin menu to show for your plugin

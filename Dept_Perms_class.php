@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 Dept_Perms_class.php - Dept_Perms is designed to handle permission settings of each department.
 Copyright (C) 2002-2004  Stephen Lawrence, Khoa Nguyen
@@ -45,7 +45,7 @@ if (!defined('Dept_Perms_class')) {
          * @param int $id
          * @param PDO $connection
          */
-        public function Dept_Perms($id, PDO $connection)
+        public function __construct($id, PDO $connection)
         {
             // this can be fid or uid
             $this->id = $id;

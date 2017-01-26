@@ -1,6 +1,6 @@
 <?php
 /*
-UserPermission_class.php - relates users to files 
+UserPermission_class.php - relates users to files
 Copyright (C) 2002-2004 Stephen Lawrence Jr., Khoa Nguyen
 Copyright (C) 2005-2011 Stephen Lawrence Jr.
 This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ if (!defined('UserPermission_class')) {
          * @param int $uid
          * @param PDO $connection
          */
-        public function UserPermission($uid, PDO $connection)
+        public function __construct($uid, PDO $connection)
         {
             $this->uid = $uid;
             $this->connection = $connection;
@@ -208,7 +208,7 @@ if (!defined('UserPermission_class')) {
          */
         public function combineArrays($high_priority_array, $low_priority_array)
         {
-            return databaseData::combineArrays($high_priority_array, $low_priority_array);
+            return parent::combineArrays($high_priority_array, $low_priority_array);
         }
 
         /**

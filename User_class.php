@@ -40,7 +40,7 @@ if (!defined('User_class')) {
          * @param int $id
          * @param PDO $connection
          */
-        public function User($id, PDO $connection)
+        public function __construct($id, PDO $connection)
         {
             $this->root_id = $GLOBALS['CONFIG']['root_id'];
             $this->field_name = 'username';
@@ -48,24 +48,24 @@ if (!defined('User_class')) {
             $this->tablename = $GLOBALS['CONFIG']['db_prefix'] . $this->TABLE_USER;
             $this->result_limit = 1; //there is only 1 user with a certain user_name or user_id
 
-            databaseData::setTableName($this->TABLE_USER);
-            databaseData::databaseData($id, $connection);
+            parent::setTableName($this->TABLE_USER);
+            parent::__construct($id, $connection);
 
             $query = "
-                    SELECT 
-                        id, 
-                        username, 
-                        department, 
-                        phone, 
-                        email, 
-                        last_name, 
-                        first_name, 
+                    SELECT
+                        id,
+                        username,
+                        department,
+                        phone,
+                        email,
+                        last_name,
+                        first_name,
                         pw_reset_code,
                         can_add,
                         can_checkin
-                    FROM 
-                        {$GLOBALS['CONFIG']['db_prefix']}user 
-                    WHERE 
+                    FROM
+                        {$GLOBALS['CONFIG']['db_prefix']}user
+                    WHERE
                         id = :id";
             $stmt = $connection->prepare($query);
             $stmt->execute(array(':id' => $this->id));
@@ -206,7 +206,7 @@ if (!defined('User_class')) {
             }
             return false;
         }
-        
+
         /**
         * @return boolean
         */
@@ -347,7 +347,7 @@ if (!defined('User_class')) {
             if ($this->isAdmin()) {
                 return true;
             }
-            
+
             // Lets see if this non-admin user has a department they can review for, if so, they are a reviewer
             $query = "
             SELECT
@@ -381,7 +381,7 @@ if (!defined('User_class')) {
                             {$GLOBALS['CONFIG']['db_prefix']}data as d,
                             {$GLOBALS['CONFIG']['db_prefix']}dept_reviewer as dr
                       WHERE
-                            
+
                             dr.dept_id = d.department AND
                             dr.user_id = :user_id AND
                             d.department = dr.dept_id AND
@@ -422,7 +422,7 @@ if (!defined('User_class')) {
                 return $file_data;
             }
         }
-        
+
         /**
          * getRevieweeIds - Return an array of files that need reviewing under this person
          * @return array

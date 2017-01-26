@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 if (!defined("databaseData_class"));
 {
     define("databaseData_class", "true", false);
-    
+
     //DO NOT INSTANTIATE THIS ABSTRACT CLASS
     class databaseData
     {
@@ -56,7 +56,7 @@ if (!defined("databaseData_class"));
          * @param int $id
          * @param PDO $connection
          */
-        public function databaseData($id, PDO $connection)
+        public function __construct($id, PDO $connection)
         {
             $this->connection = $connection;
             $this->setId($id); //setId not only set the $id data member but also find and set name

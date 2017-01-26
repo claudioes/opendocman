@@ -62,14 +62,14 @@ if (!defined('FileData_class')) {
         public $rb_operacion_id;
         protected $connection;
 
-        public function FileData($id, $connection)
+        public function __construct($id, $connection)
         {
             $this->field_name = 'realname';
             $this->field_id = 'id';
             $this->result_limit = 1;  //EVERY FILE IS LISTED UNIQUELY ON THE DATABASE DATA;
             $this->tablename = $this->TABLE_DATA;
             $this->connection = $connection;
-            databaseData::databaseData($id, $connection);
+            parent::__construct($id, $connection);
 
             $this->loadData();
         }
@@ -456,7 +456,7 @@ if (!defined('FileData_class')) {
          */
         public function getRealName()
         {
-            return databaseData::getName();
+            return parent::getName();
         }
 
         /**

@@ -2,7 +2,7 @@
 /**
  * Plugin_class should be used as an abstract class to create your own plugins.
  * See the README file in the HelloWorld plugin folder for details
- * 
+ *
     Copyright (C) 2010-2011 Stephen Lawrence Jr.
 
     This program is free software; you can redistribute it and/or
@@ -29,8 +29,8 @@ class Plugin
     public $homepage = '';
     public $description = '';
     public $pluginslist = '';
-    
-    public function Plugin()
+
+    public function __construct()
     {
         $name = $this->name;
         $version = $this->version;
@@ -220,7 +220,7 @@ class Plugin
     public function onAfterDetails($fileid)
     {
     }
-    
+
     /*
      * This function is run before the file list view
      */
@@ -241,7 +241,7 @@ class Plugin
     public function onBeforeEditFileSaved()
     {
     }
-        
+
      /*
      * This function is run while the add department form is being drawn
      */
@@ -267,7 +267,7 @@ class Plugin
     public function onDepartmentModifySave($formData)
     {
     }
-    
+
     /*
      * This function is run while the add department form is being submitted
      * @param int $deptId The new department ID
@@ -276,7 +276,7 @@ class Plugin
     public function onDepartmentAddSave($deptId)
     {
     }
-    
+
     /*
      * This function is run after the file history page is displayed
      * @param int $file_id The new file id

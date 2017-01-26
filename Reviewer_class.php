@@ -20,7 +20,7 @@ class Reviewer extends databaseData
 {
     protected $connection;
 
-    public function Reviewer($id, PDO $pdo)
+    public function __construct($id, PDO $pdo)
     {
         $this->id = $id;
         $this->connection = $pdo;
@@ -47,7 +47,7 @@ class Reviewer extends databaseData
         if ($num_rows < 1) {
             return false;
         }
-        
+
         $count = 0;
         foreach ($result as $row) {
             $reviewers[$count] = $row['user_id'];

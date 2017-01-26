@@ -1,7 +1,7 @@
-<?php	
+<?php
 /*
 Department_class.php - Department class is an extended class of the abstract databaseData
-class.  The only difference is that it provides it's own constructor to handle its own 
+class.  The only difference is that it provides it's own constructor to handle its own
 characteristics.
 Copyright (C) 2002-2004 Stephen Lawrence Jr., Khoa Nguyen
 Copyright (C) 2005-2015 Stephen Lawrence Jr.
@@ -30,13 +30,13 @@ if (!defined('Department_class')) {
          * @param int $id
          * @param PDO $connection
          */
-        public function Department($id, PDO $connection)
+        public function __construct($id, PDO $connection)
         {
             $this->field_name = 'name';
             $this->field_id = 'id';
             $this->result_limit = 1; //there is only 1 department with a certain department_id and department_name
             $this->tablename = $this->TABLE_DEPARTMENT;
-            databaseData::databaseData($id, $connection);
+            parent::__construct($id, $connection);
         }
 
         /**

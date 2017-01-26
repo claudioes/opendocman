@@ -24,11 +24,11 @@ class Email
     private $body;
     private $headers;
     private $recipients;
-    
+
     /*
      * Constructor
      */
-    public function Email()
+    public function __construct()
     {
     }
 
