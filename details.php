@@ -74,37 +74,48 @@ $comment = $file_data_obj->getComment();
 $status = $file_data_obj->getStatus();
 $reviewer = $file_data_obj->getReviewerName();
 
-$rb = 'N/A';
-$rb_id = $file_data_obj->rb_id;
-if ($rb_id) {
-    $sth = $pdo->prepare('
-        SELECT codigo, detalle
-        FROM ' . MAZDEN_DB_NAME . '.rb
-        WHERE id=?
-    ');
-    $sth->execute([$rb_id]);
-    $data = $sth->fetch(\PDO::FETCH_ASSOC);
-
-    $rb = $data['codigo'] . ' - ' . $data['detalle'];
-}
-
-$rb_operacion = 'N/A';
-$rb_operacion_id = $file_data_obj->rb_operacion_id;
-if ($rb_operacion_id) {
-    $sth = $pdo->prepare('
-        SELECT orden, taller, descripcion
-        FROM ' . MAZDEN_DB_NAME . '.rb_operaciones
-        WHERE id=?
-    ');
-    $sth->execute([$rb_operacion_id]);
-    $data = $sth->fetch(\PDO::FETCH_ASSOC);
-
-    $rb_operacion =
-        '<span class="taller-' . strtolower($data['taller'])  . '">' .
-            strtoupper($data['taller']) .
-        '</span> Nº ' . $data['orden'] . ': ' . $data['descripcion'];
-}
-
+$rbs = $file_data_obj->getRegistrosBaseExtendido();
+// $rbTable = '';
+//
+// if ($rbs) {
+//     $rbOperaciones = [];
+//
+//     foreach($rbs as $rb) {
+//         $rbOperaciones[] = $rb['rb_operacion_id'];
+//     }
+//
+//     $rows = $pdo->query('
+//         SELECT r.codigo, r.detalle, o.orden, o.taller, o.descripcion
+//         FROM ' . MAZDEN_DB_NAME . '.rb r
+//         JOIN ' . MAZDEN_DB_NAME . '.rb_operaciones o ON r.id = o.idrb
+//         WHERE o.id IN (' . join(',', $rbOperaciones) . ')
+//     ')->fetchAll(\PDO::FETCH_ASSOC);
+//
+//     $rbTable = '
+//         <table class="table">
+//             <thead>
+//                 <tr>
+//                     <th>RB Nº</th>
+//                     <th>Detalle</th>
+//                     <th>Taller</th>
+//                     <th>Operación</th>
+//                     <th>Descripción</th>
+//                 </tr>
+//             </thead>
+//             <tbody>
+//     ';
+//
+//     foreach($rows as $data) {
+//         $rbTable .= '<tr><td>'.$data['codigo']
+//             .'</td><td>'.$data['detalle']
+//             .'</td class="text-center"><td><span class="taller-'.strtolower($data['taller']).'">'.strtoupper($data['taller']).'</span>'
+//             .'</td class="text-right"><td>'.$data['orden']
+//             .'</td><td>'.$data['descripcion']
+//             .'</td></tr>';
+//     }
+//
+//     $rbTable .= '</tbody></table>';
+// }
 
 // corrections
 if ($description == '') {
@@ -236,8 +247,7 @@ $file_detail_array = array(
     'file_under_review' => $file_under_review,
     'reviewer' => $reviewer,
     'status' => $status,
-    'rb' => $rb,
-    'rb_operacion' => $rb_operacion,
+    'rbs' => $rbs
 );
 
 if ($status > 0) {

@@ -50,14 +50,6 @@
             <div id="details_revision">{$file_detail.revision|escape:'html'}</div>
         </td>
     </tr>
-    <tr>
-        <td class="title">Registro base Nº:</td>
-        <td>{$file_detail.rb nofilter}</td>
-    </tr>
-    <tr>
-        <td class="title">Operación Nº:</td>
-        <td>{$file_detail.rb_operacion nofilter}</td>
-    </tr>
     {if $file_detail.file_under_review}
         <tr>
             <td class="title">{$g_lang_label_reviewer}:</td>
@@ -71,6 +63,35 @@
             <td><a href="mailto:{$checkout_person_email|escape:'html'}?Subject=Regarding%20your%20checked-out%20document:{$file_detail.realname|escape:'html'}&Body=Hello%20{$checkout_person_full_name.$fullname[0]|escape:'html'}"> {$checkout_person_full_name[1]|escape:'html'}, {$checkout_person_full_name[0]|escape:'html'}</a></td>
         </tr>
     {/if}
+</table>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>RB Nº</th>
+            <th>Detalle</th>
+            <th>Taller</th>
+            <th>Operación</th>
+            <th>Descripción</th>
+        </tr>
+     </thead>
+     <tbody>
+        {foreach from=$file_detail.rbs item=rb}
+            <tr>
+                <td style="text-align:right;">{$rb.codigo|escape:'html'}</td>
+                <td>{$rb.detalle|escape:'html'}</td>
+                <td style="text-align:center;">
+                    <span class="taller-{$rb.taller|lower}">{$rb.taller|escape:'html'|upper}</span>
+                </td>
+                <td style="text-align:right;">{$rb.orden|escape:'html'}</td>
+                <td>{$rb.descripcion|escape:'html'}</td>
+            </tr>
+        {foreachelse}
+            <tr>
+                <td colspan="5" style="text-align:center;">El documento no tiene registros base asociados</td>
+            </tr>
+        {/foreach}
 </table>
 
 <div class="row text-center">

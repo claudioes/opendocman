@@ -8,33 +8,56 @@ function enforceLength(data_str, max_len)
 }
 
 $(function() {
-	var $rbId = $('#rb_id');
-	var $rbOperacionId = $('#rb_operacion_id');
+	var $rbAddRow = $('#rb-add-row');
+	var $rbTable = $('#rb-table');
 
-	$rbId.on('change', function (e) {
+	$rbAddRow.click(function (e) {
+		var $row = $('<tr>').append([
+			'<td>', rbSelect ,'</td>',
+			'<td><select class="rb-operacion-select" name="rb_operacion_id[]"><select></td>',
+			'<td class="text-center">',
+				'<a href="#" class="rb-delete-row" title="Eliminar fila">',
+					'<i class="icon-remove"></i>',
+				'</a>',
+			'</td>',
+		].join(''));
+
+		$rbTable.find('tbody').append($row);
+	});
+
+	$rbTable.on('click', 'a.rb-delete-row', function (e) {
+		e.preventDefault();
+		$(this).closest('tr').remove();
+	});
+
+	$rbTable.on('change', 'select.rb-select', function (e) {
+		var rbId = this.value;
+		var $row = $(this).closest('tr');
+		var $rbOperaciones = $row.find('select.rb-operacion-select');
+
 		$.ajax({
 			url: baseUrl + '/ajax.php',
 			data: {
 				f: 'rb_operaciones',
-				id: $rbId.val(),
+				id: rbId,
 			},
 			type: 'get',
 			dataType: 'json',
 			success: function (result) {
-				var data = result.data;
-				var rows = [];
+				var operaciones = result.data;
+				var options = [];
 
-				for(var i = 0; i < data.length; i++) {
-					var d = data[i];
-					rows.push(
-						'<option value="', d.id ,'">',
-							d.orden, ' (', d.taller, ') - ',
-							d.descripcion.substring(0, 50),
+				for(var i = 0; i < operaciones.length; i++) {
+					var operacion = operaciones[i];
+					options.push(
+						'<option value="', operacion.id ,'">',
+							operacion.orden, ' (', operacion.taller, ') - ',
+							operacion.descripcion.substring(0, 50),
 						'</option>'
 					);
 				}
 
-				$rbOperacionId.html(rows.join(''));
+				$rbOperaciones.html(options.join(''));
 			}
 		});
 	});

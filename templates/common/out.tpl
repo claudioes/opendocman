@@ -17,8 +17,6 @@
                     <th class="sorting">{$g_lang_label_department}</th>
                     <th class="sorting">{$g_lang_label_size}</th>
                     <th class="">{$g_lang_label_status}</th>
-                    <th class="">RB Nº</th>
-                    <th class="">Operación Nº</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,18 +48,6 @@
                                 <img src="{$g_base_url}/images/file_locked.png" alt="locked" />
                             {/if}
                         </td>
-                        <td class="center">
-                            {if $item.rb_id gt 0}
-                                {$item.rb_id|escape:'html'}
-                            {/if}
-                        </td>
-                        <td class="center">
-                            {if $item.rb_operacion_id gt 0}
-                                <span class="taller-{$item.rb_operacion.taller|lower}">
-                                    {$item.rb_operacion.orden|escape:'html'}
-                                </span>
-                            {/if}
-                        </td>
                     </tr>
                 {/foreach}
             </tbody>
@@ -70,8 +56,6 @@
                     {if $item.showCheckbox eq '1'}
                         <th></th>
                     {/if}
-                    <th></th>
-                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>

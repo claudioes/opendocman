@@ -1,4 +1,19 @@
 <script type="text/javascript" src="functions.js"></script>
+<script type="text/javascript">
+
+    var rbSelect = '{strip}
+        <select class="rb-select" name="rb_id[]">
+            <option></option>
+            {foreach from=$rbs item=rb}
+                <option value="{$rb.id}">
+                    {$rb.codigo} - {$rb.detalle}
+                </option>
+            {/foreach}
+        </select>
+    {/strip}';
+
+</script>
+
 <!-- file upload formu using ENCTYPE -->
 <form id="addeditform" name="main" class="form-horizontal" action="add.php" method="POST" enctype="multipart/form-data" onsubmit="return checksec();">
     <input type="hidden" id="db_prefix" value="{$db_prefix|escape:'html'}" />
@@ -86,20 +101,26 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label">Registro base Nº</label>
+        <label class="control-label">Registro base</label>
         <div class="controls">
-            <select id="rb_id" name="rb_id" style="width:100%;">
-                <option value="" selected></option>
-                {foreach from=$rbs item=rb}
-                    <option value="{$rb.id}">{$rb.codigo|escape:'html'} - {$rb.detalle|escape:'html'}</option>
-                {/foreach}
-            </select>
-        </div>
-    </div>
-
-    <div class="control-group">
-        <label class="control-label">Operación Nº</label>
-        <div class="controls">
-            <select id="rb_operacion_id" name="rb_operacion_id" style="width:100%;"></select>
+            <table class="table" id="rb-table">
+                <thead>
+                    <tr>
+                        <th>Registro</th>
+                        <th>Operación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <button type="button" class="btn" id="rb-add-row">
+                                <i class="icon-plus"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>

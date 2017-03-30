@@ -58,8 +58,6 @@ if (!defined('FileData_class')) {
         public $admin_users;
         public $filesize;
         public $isLocked;
-        public $rb_id;
-        public $rb_operacion_id;
         protected $connection;
 
         public function __construct($id, $connection)
@@ -117,9 +115,7 @@ if (!defined('FileData_class')) {
                 comment,
                 status,
                 department,
-                default_rights,
-                rb_id,
-                rb_operacion_id
+                default_rights
               FROM
                 {$GLOBALS['CONFIG']['db_prefix']}$this->tablename
               WHERE
@@ -140,8 +136,6 @@ if (!defined('FileData_class')) {
                     $this->status = $row['status'];
                     $this->department = $row['department'];
                     $this->default_rights = $row['default_rights'];
-                    $this->rb_id = $row['rb_id'];
-                    $this->rb_operacion_id = $row['rb_operacion_id'];
                 }
             } else {
                 $this->error = 'Non unique file id';
@@ -164,9 +158,7 @@ if (!defined('FileData_class')) {
                 comment = :comment,
                 status = :status,
                 department = :department,
-                default_rights = :default_rights,
-                rb_id = :rb_id,
-                rb_operacion_id = :rb_operacion_id
+                default_rights = :default_rights
                WHERE
                 id = :id
             ";
@@ -180,8 +172,6 @@ if (!defined('FileData_class')) {
                 ':status' => $this->status,
                 ':department' => $this->department,
                 ':default_rights' => $this->default_rights,
-                ':rb_id' => $this->rb_id,
-                ':rb_operacion_id' => $this->rb_operacion_id,
                 ':id' => $this->id
             ));
         }
@@ -486,18 +476,6 @@ if (!defined('FileData_class')) {
             return $result;
         }
 
-        public function getOperacion() {
-            if ((int)$this->rb_operacion_id > 0) {
-                $query = "SELECT taller, orden, descripcion FROM " . MAZDEN_DB_NAME . ".rb_operaciones WHERE id = :id";
-                $stmt = $this->connection->prepare($query);
-                $stmt->execute(array(':id' => $this->rb_operacion_id));
-                $result = $stmt->fetch();
-                return $result;
-            }
-
-            return null;
-        }
-
         /**
          * convert an array of user id into an array of user objects
          * @param array $uid_array
@@ -704,6 +682,37 @@ if (!defined('FileData_class')) {
         public function isLocked()
         {
             return $this->isLocked;
+        }
+
+        public function getRegristrosBase()
+        {
+            $query = "
+              SELECT
+                rb_id, rb_operacion_id
+              FROM
+                {$GLOBALS['CONFIG']['db_prefix']}data_rb
+              WHERE
+                data_id = ?
+            ";
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute([$this->id]);
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
+        public function getRegistrosBaseExtendido()
+        {
+            $query = '
+                SELECT r.codigo, r.detalle, o.orden, o.taller, o.descripcion
+                FROM ' . MAZDEN_DB_NAME . '.rb r
+                JOIN ' . MAZDEN_DB_NAME . '.rb_operaciones o ON r.id = o.idrb
+                JOIN ' . $GLOBALS['CONFIG']['db_prefix'] . 'data_rb d ON r.id = d.rb_id AND o.id = d.rb_operacion_id
+                WHERE d.data_id = ?
+            ';
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute([$this->id]);
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
     }
 }

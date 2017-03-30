@@ -350,9 +350,6 @@ function list_files($fileid_array, $userperms_obj, $dataDir, $showCheckBox = fal
             'lock' => $lock,
             'showCheckbox' => $showCheckBox,
             'rejectpage' => $rejectpage,
-            'rb_id' => $file_obj->rb_id,
-            'rb_operacion_id' => $file_obj->rb_operacion_id,
-            'rb_operacion' => $file_obj->getOperacion(),
         );
         //print_r($file_list_arr);exit;
     }

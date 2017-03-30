@@ -278,9 +278,7 @@ if (!isset($_POST['submit'])) {
             department,
             comment,
             default_rights,
-            publishable,
-            rb_id,
-            rb_operacion_id
+            publishable
         )
             VALUES
         (
@@ -293,9 +291,7 @@ if (!isset($_POST['submit'])) {
             :current_user_dept,
             :comment,
             0,
-            $publishable,
-            :rb_id,
-            :rb_operacion_id
+            $publishable
         )";
 
         $file_data_stmt = $pdo->prepare($file_data_query);
@@ -310,8 +306,6 @@ if (!isset($_POST['submit'])) {
         // Registro base y número de operación
         $rb_id = (int)$_REQUEST['rb_id'] ?: null;
         $rb_operacion_id = (int)$_REQUEST['rb_operacion_id'] ?: null;
-        $file_data_stmt->bindParam(':rb_id', $rb_id);
-        $file_data_stmt->bindParam(':rb_operacion_id', $rb_operacion_id);
 
         $file_data_stmt->execute();
 
@@ -319,6 +313,25 @@ if (!isset($_POST['submit'])) {
         $fileId = $pdo->lastInsertId();
 
         udf_add_file_insert($fileId);
+
+        // RB
+
+        $rb_stmt = $pdo->prepare("
+            INSERT INTO {$GLOBALS['CONFIG']['db_prefix']}data_rb
+                (data_id, rb_id, rb_operacion_id)
+            VALUES
+                (?, ?, ?)
+        ");
+
+        foreach((array)$_POST['rb_id'] as $i => $rbId) {
+            $rbOperacionId = $_POST['rb_operacion_id'][$i];
+
+            $rb_stmt->execute([
+                $fileId,
+                $rbId,
+                $rbOperacionId
+            ]);
+        }
 
         $username = $user_obj->getUserName();
 
