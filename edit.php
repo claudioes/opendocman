@@ -83,31 +83,15 @@ if (!isset($_REQUEST['submit'])) {
         $comment = $filedata->getComment();
         $owner_id = $filedata->getOwner();
         $department = $filedata->getDepartment();
-        $rb_id = $filedata->rb_id;
-        $rb_operacion_id = $filedata->rb_operacion_id;
+        $fileRbs = $filedata->getRegistrosBaseExtendido();
 
         // Registros bases de produccion
-        $sth = $pdo->prepare('
+        $sth = $pdo->prepare("
             SELECT id, codigo, detalle
-            FROM ' . MAZDEN_DB_NAME . '.rb
-            ORDER BY codigo
-        ');
+            FROM " . MAZDEN_DB_NAME . ".rb ORDER BY codigo
+        ");
         $sth->execute();
         $rbs = $sth->fetchAll(\PDO::FETCH_ASSOC);
-
-        // Operaciones del registro de producción
-        $rb_operaciones = null;
-        if ($rb_id) {
-            $sth = $pdo->prepare('
-                SELECT o.id, o.taller, o.orden, o.descripcion
-                FROM ' . MAZDEN_DB_NAME . '.rb_operaciones o
-                JOIN ' . MAZDEN_DB_NAME . '.rb r ON o.idrb IN (r.id, r.idrb_origen)
-                WHERE r.id=?
-                ORDER BY o.taller, o.orden
-            ');
-            $sth->execute([$rb_id]);
-            $rb_operaciones = $sth->fetchAll(\PDO::FETCH_ASSOC);
-        }
 
         //CHM
         $table_name_query = "SELECT table_name FROM {$GLOBALS['CONFIG']['db_prefix']}udf WHERE field_type = '4'";
@@ -176,10 +160,8 @@ if (!isset($_REQUEST['submit'])) {
         $GLOBALS['smarty']->assign('pre_selected_department', $department);
         $GLOBALS['smarty']->assign('description', $description);
         $GLOBALS['smarty']->assign('comment', $comment);
-        $GLOBALS['smarty']->assign('rb_id', $rb_id);
-        $GLOBALS['smarty']->assign('rb_operacion_id', $rb_operacion_id);
         $GLOBALS['smarty']->assign('rbs', $rbs);
-        $GLOBALS['smarty']->assign('rb_operaciones', $rb_operaciones);
+        $GLOBALS['smarty']->assign('file_rbs', $fileRbs);
         $GLOBALS['smarty']->assign('db_prefix', $GLOBALS['CONFIG']['db_prefix']);
 
         display_smarty_template('edit.tpl');
@@ -248,6 +230,29 @@ if (!isset($_REQUEST['submit'])) {
     $filedata->updateData();
 
     udf_add_file_insert($fileId);
+
+    // RB
+
+    $rb_stmt = $pdo->prepare("
+        DELETE FROM {$GLOBALS['CONFIG']['db_prefix']}data_rb
+        WHERE data_id = ?
+    ");
+    $rb_stmt->execute([$fileId]);
+
+    $rb_stmt = $pdo->prepare("
+        INSERT INTO {$GLOBALS['CONFIG']['db_prefix']}data_rb
+            (data_id, rb_id, rb_operacion_id)
+        VALUES
+            (?, ?, ?)
+    ");
+
+    foreach((array)$_POST['rb_id'] as $i => $rbId) {
+        $rb_stmt->execute([
+            $fileId,
+            $rbId,
+            $_POST['rb_operacion_id'][$i]
+        ]);
+    }
 
     // clean out old permissions
     $del_user_perms_query = "DELETE FROM {$GLOBALS['CONFIG']['db_prefix']}user_perms WHERE fid = :file_id";

@@ -703,10 +703,10 @@ if (!defined('FileData_class')) {
         public function getRegistrosBaseExtendido()
         {
             $query = '
-                SELECT r.codigo, r.detalle, o.orden, o.taller, o.descripcion
+                SELECT r.id AS rb_id, r.codigo, r.detalle, o.id AS rb_operacion_id, o.orden, o.taller, o.descripcion
                 FROM ' . MAZDEN_DB_NAME . '.rb r
                 JOIN ' . MAZDEN_DB_NAME . '.rb_operaciones o ON r.id = o.idrb
-                JOIN ' . $GLOBALS['CONFIG']['db_prefix'] . 'data_rb d ON r.id = d.rb_id AND o.id = d.rb_operacion_id
+                JOIN ' . $GLOBALS['CONFIG']['db_prefix'] . 'data_rb d ON d.rb_id IN (r.id, r.idrb_origen) AND o.id = d.rb_operacion_id
                 WHERE d.data_id = ?
             ';
             $stmt = $this->connection->prepare($query);

@@ -1,4 +1,18 @@
 <script type="text/javascript" src="functions.js"></script>
+<script type="text/javascript">
+
+    var rbSelect = '{strip}
+        <select class="rb-select" name="rb_id[]">
+            <option></option>
+            {foreach from=$rbs item=rb}
+                <option value="{$rb.id}">
+                    {$rb.codigo} - {$rb.detalle}
+                </option>
+            {/foreach}
+        </select>
+    {/strip}';
+
+</script>
 
 <form id="addeditform" name="main" class="form-horizontal" action="{$smarty.server.PHP_SELF|escape:'html'}" method="POST" enctype="multipart/form-data" onsubmit="return checksec(); ">
     <input type="hidden" id="db_prefix" value="{$db_prefix}" />
@@ -99,29 +113,41 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label">Registro base Nº</label>
+        <label class="control-label">Registro base</label>
         <div class="controls">
-            <select id="rb_id" name="rb_id" style="width:100%;">
-                <option value="" selected></option>
-                {foreach from=$rbs item=rb}
-                    <option value="{$rb.id}" {if $rb_id eq $rb.id} selected='selected' {/if}>
-                        {$rb.codigo} - {$rb.detalle}
-                    </option>
-                {/foreach}
-            </select>
-        </div>
-    </div>
+            <table class="table" id="rb-table">
+                <thead>
+                    <tr>
+                        <th>Registro</th>
+                        <th>Operación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach from=$file_rbs item=rb}
+                        <tr>
+                            <input type="hidden" name="rb_id[]" value="{$rb.rb_id}">
+                            <input type="hidden" name="rb_operacion_id[]" value="{$rb.rb_operacion_id}">
 
-    <div class="control-group">
-        <label class="control-label">Operación Nº</label>
-        <div class="controls">
-            <select id="rb_operacion_id" name="rb_operacion_id" style="width:100%;">
-                <option value="" selected></option>
-                {foreach from=$rb_operaciones item=op}
-                    <option value="{$op.id}" {if $rb_operacion_id eq $op.id} selected='selected' {/if}>
-                        {$op.orden} ({$op.taller}) - {$op.descripcion}
-                    </option>
-                {/foreach}
-            </select>
+                            <td>{$rb.codigo} - {$rb.detalle}</td>
+                            <td><span class="taller-{$rb.taller|lower}">{$rb.taller|escape:'html'|upper}</span> {$rb.orden} - {$rb.descripcion}</td>
+                            <td style="text-align:center;">
+                				<a href="#" class="rb-delete-row" title="Eliminar fila">
+                					<i class="icon-remove"></i>
+                				</a>
+                			</td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <button type="button" class="btn" id="rb-add-row">
+                                <i class="icon-plus"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>

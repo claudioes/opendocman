@@ -324,12 +324,10 @@ if (!isset($_POST['submit'])) {
         ");
 
         foreach((array)$_POST['rb_id'] as $i => $rbId) {
-            $rbOperacionId = $_POST['rb_operacion_id'][$i];
-
             $rb_stmt->execute([
                 $fileId,
                 $rbId,
-                $rbOperacionId
+                $_POST['rb_operacion_id'][$i]
             ]);
         }
 
