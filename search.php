@@ -245,7 +245,7 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
         }
 
         if ($search_rb_id) {
-            $where[] = "EXISTS (SELECT 1 FROM odm_data_rb WHERE odm_data_rb.rb_id = :rb_id AND odm_data_rb.data_id = d.id)";
+            $where[] = "EXISTS (SELECT 1 FROM {$GLOBALS['CONFIG']['db_prefix']}data_rb WHERE {$GLOBALS['CONFIG']['db_prefix']}data_rb.rb_id = :rb_id AND {$GLOBALS['CONFIG']['db_prefix']}data_rb.data_id = d.id)";
             $params['rb_id'] = $search_rb_id;
         }
 
