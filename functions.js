@@ -14,7 +14,7 @@ $(function() {
 	$rbAddRow.click(function (e) {
 		var $row = $('<tr>').append([
 			'<td>', rbSelect ,'</td>',
-			'<td><select class="rb-operacion-select" name="rb_operacion_id[]"><select></td>',
+			'<td><select class="rb-operacion-select" style="width:100%;" name="rb_operacion_id[]"><select></td>',
 			'<td style="text-align:center;">',
 				'<a href="#" class="rb-delete-row" title="Eliminar fila">',
 					'<i class="icon-remove"></i>',

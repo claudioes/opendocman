@@ -2,7 +2,7 @@
 <script type="text/javascript">
 
     var rbSelect = '{strip}
-        <select class="rb-select" name="rb_id[]">
+        <select class="rb-select" style="width:100%;" name="rb_id[]">
             <option></option>
             {foreach from=$rbs item=rb}
                 <option value="{$rb.id}">
@@ -115,12 +115,12 @@
     <div class="control-group">
         <label class="control-label">Registro base</label>
         <div class="controls">
-            <table class="table" id="rb-table">
+            <table class="table" id="rb-table" width="100%">
                 <thead>
                     <tr>
-                        <th>Registro</th>
-                        <th>Operación</th>
-                        <th></th>
+                        <th width="49%">Registro</th>
+                        <th width="49%">Operación</th>
+                        <th width="2%"></th>
                     </tr>
                 </thead>
                 <tbody>
