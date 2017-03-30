@@ -245,7 +245,7 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
         }
 
         if ($search_rb_id) {
-            $where[] = "d.rb_id = :rb_id";
+            $where[] = "EXISTS (SELECT 1 FROM odm_data_rb WHERE odm_data_rb.rb_id = :rb_id AND odm_data_rb.data_id = d.id)";
             $params['rb_id'] = $search_rb_id;
         }
 
@@ -289,8 +289,8 @@ $search_exact_phrase = isset($_GET['search_exact_phrase']);
             $query .= ' ORDER BY d.id ASC';
         }
 
-        //echo $query;
-        
+        //die($query);
+
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         $result = $stmt->fetchAll();
