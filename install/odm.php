@@ -414,32 +414,3 @@ foreach ($sql_operations as $query) {
     $stmt = $pdo->prepare($query);
     $stmt->execute();
 }
-
-$query = "
-ALTER TABLE {$dbprefix}data
-ADD COLUMN `rb_id` INT(11) NULL DEFAULT NULL,
-ADD COLUMN `rb_operacion_id` INT(11) NULL DEFAULT NULL
-";
-$stmt = $pdo->prepare($query);
-$stmt->execute();
-
-$query = "
-CREATE TABLE `{$dbprefix}export_rp` (
-	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`data_id` INT(11) NOT NULL,
-	`destination` VARCHAR(255) NOT NULL,
-	PRIMARY KEY (`id`)
-)ENGINE=MyISAM";
-$stmt = $pdo->prepare($query);
-$stmt->execute();
-
-$query = "
-ALTER TABLE `{$dbprefix}data`
-	DROP INDEX `data_idx`,
-	DROP INDEX `id`,
-	DROP INDEX `id_2`,
-	DROP INDEX `description`,
-	DROP INDEX `publishable`;
-";
-$stmt = $pdo->prepare($query);
-$stmt->execute();

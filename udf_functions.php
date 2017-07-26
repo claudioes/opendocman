@@ -124,7 +124,7 @@ if (!defined('udf_functions')) {
                 $explode_row = explode('_', $row[0]);
                 $field_name = $explode_row[2];
 
-                $query = "SELECT * FROM {$row[0]}";
+                $query = "SELECT * FROM " . strtolower($row[0]);
                 $stmt = $pdo->prepare($query);
                 $stmt->execute();
                 $sub_result = $stmt->fetchAll();
@@ -689,7 +689,7 @@ if (!defined('udf_functions')) {
             exit;
         }
 
-        $table_name = str_replace(' ', '', $GLOBALS['CONFIG']['db_prefix'] . 'udftbl_' . $_REQUEST['table_name']);
+        $table_name = strtolower(str_replace(' ', '', $GLOBALS['CONFIG']['db_prefix'] . 'udftbl_' . $_REQUEST['table_name']));
 
         if(!is_valid_udf_name($table_name))
         {

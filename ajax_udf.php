@@ -32,7 +32,7 @@ if (isset($_GET['add_value'])) {
 }
 
 if (isset($_GET['table'])) {
-    $table_name = $_GET['table'];
+    $table_name = strtolower($_GET['table']);
 }
 ?>
     <table border="0">

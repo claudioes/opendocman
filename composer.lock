@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "950f5162622ebf16e7829c16f957f13b",
     "content-hash": "f1709faf09f81e04ccf71d856b0899c9",
     "packages": [
         {
@@ -54,27 +53,28 @@
                 "di",
                 "di container"
             ],
-            "time": "2016-01-21 09:34:53"
+            "time": "2016-01-21T09:34:53+00:00"
         },
         {
             "name": "aura/html",
-            "version": "2.4.1",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Html.git",
-                "reference": "7f575f35765af41091b85b23a92b168ae0c5765f"
+                "reference": "eda14b491f45fe2e1d1fec3364b1c783d7b7da31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Html/zipball/7f575f35765af41091b85b23a92b168ae0c5765f",
-                "reference": "7f575f35765af41091b85b23a92b168ae0c5765f",
+                "url": "https://api.github.com/repos/auraphp/Aura.Html/zipball/eda14b491f45fe2e1d1fec3364b1c783d7b7da31",
+                "reference": "eda14b491f45fe2e1d1fec3364b1c783d7b7da31",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "aura/di": "~2.0"
+                "aura/di": "~2.0",
+                "phpunit/phpunit": "~5.7 || ~4.8"
             },
             "type": "library",
             "extra": {
@@ -83,9 +83,6 @@
                     "config": {
                         "common": "Aura\\Html\\_Config\\Common"
                     }
-                },
-                "branch-alias": {
-                    "dev-develop-2": "2.1.x-dev"
                 }
             },
             "autoload": {
@@ -117,20 +114,20 @@
                 "html",
                 "input"
             ],
-            "time": "2015-03-27 17:31:31"
+            "time": "2017-07-21T06:56:56+00:00"
         },
         {
             "name": "aura/view",
-            "version": "2.2.1",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.View.git",
-                "reference": "57296d7357fd34412436ce4028cfd3ce3e08f049"
+                "reference": "58dbc0361c040019be72cf410e693583c469b084"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.View/zipball/57296d7357fd34412436ce4028cfd3ce3e08f049",
-                "reference": "57296d7357fd34412436ce4028cfd3ce3e08f049",
+                "url": "https://api.github.com/repos/auraphp/Aura.View/zipball/58dbc0361c040019be72cf410e693583c469b084",
+                "reference": "58dbc0361c040019be72cf410e693583c469b084",
                 "shasum": ""
             },
             "require": {
@@ -177,7 +174,7 @@
                 "twostep view",
                 "view"
             ],
-            "time": "2016-08-17 17:42:35"
+            "time": "2017-07-21T05:15:05+00:00"
         },
         {
             "name": "foa/html-view-bundle",
@@ -232,7 +229,7 @@
                 "html",
                 "view"
             ],
-            "time": "2014-10-05 16:43:07"
+            "time": "2014-10-05T16:43:07+00:00"
         },
         {
             "name": "owasp/csrf-protector-php",
@@ -240,16 +237,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mebjas/CSRF-Protector-PHP.git",
-                "reference": "c275a1af206c91a1289b34ff24faa0c706382092"
+                "reference": "aec0d6966992363a7192b2ae9fb0a9643e8fa26b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mebjas/CSRF-Protector-PHP/zipball/c275a1af206c91a1289b34ff24faa0c706382092",
-                "reference": "c275a1af206c91a1289b34ff24faa0c706382092",
+                "url": "https://api.github.com/repos/mebjas/CSRF-Protector-PHP/zipball/aec0d6966992363a7192b2ae9fb0a9643e8fa26b",
+                "reference": "aec0d6966992363a7192b2ae9fb0a9643e8fa26b",
                 "shasum": ""
             },
             "require-dev": {
-                "satooshi/php-coveralls": ">=0.6"
+                "satooshi/php-coveralls": "~1.0"
             },
             "type": "library",
             "autoload": {
@@ -268,7 +265,7 @@
                 "owasp",
                 "security"
             ],
-            "time": "2017-03-12 21:59:33"
+            "time": "2017-04-12T05:47:07+00:00"
         }
     ],
     "packages-dev": [
@@ -323,7 +320,7 @@
                 "phplint",
                 "syntax"
             ],
-            "time": "2014-09-25 16:04:45"
+            "time": "2014-09-25T16:04:45+00:00"
         },
         {
             "name": "psr/log",
@@ -370,20 +367,20 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.18",
+            "version": "v2.8.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa"
+                "reference": "46e65f8d98c9ab629bbfcc16a4ff023f61c37fb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/81508e6fac4476771275a3f4f53c3fee9b956bfa",
-                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa",
+                "url": "https://api.github.com/repos/symfony/console/zipball/46e65f8d98c9ab629bbfcc16a4ff023f61c37fb2",
+                "reference": "46e65f8d98c9ab629bbfcc16a4ff023f61c37fb2",
                 "shasum": ""
             },
             "require": {
@@ -431,7 +428,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-04 11:00:12"
+            "time": "2017-07-03T08:04:30+00:00"
         },
         {
             "name": "symfony/debug",
@@ -488,20 +485,20 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-30 07:22:48"
+            "time": "2016-07-30T07:22:48+00:00"
         },
         {
             "name": "symfony/finder",
-            "version": "v2.8.18",
+            "version": "v2.8.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "5fc4b5cab38b9d28be318fcffd8066988e7d9451"
+                "reference": "4f4e84811004e065a3bb5ceeb1d9aa592630f9ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/5fc4b5cab38b9d28be318fcffd8066988e7d9451",
-                "reference": "5fc4b5cab38b9d28be318fcffd8066988e7d9451",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/4f4e84811004e065a3bb5ceeb1d9aa592630f9ad",
+                "reference": "4f4e84811004e065a3bb5ceeb1d9aa592630f9ad",
                 "shasum": ""
             },
             "require": {
@@ -537,20 +534,20 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-21 08:33:48"
+            "time": "2017-06-01T20:52:29+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
-                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/f29dca382a6485c3cbe6379f0c61230167681937",
+                "reference": "f29dca382a6485c3cbe6379f0c61230167681937",
                 "shasum": ""
             },
             "require": {
@@ -562,7 +559,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "autoload": {
@@ -596,20 +593,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2017-06-09T14:24:12+00:00"
         },
         {
             "name": "symfony/process",
-            "version": "v2.8.18",
+            "version": "v2.8.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "41336b20b52f5fd5b42a227e394e673c8071118f"
+                "reference": "57e52a0a6a80ea0aec4fc1b785a7920a95cb88a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/41336b20b52f5fd5b42a227e394e673c8071118f",
-                "reference": "41336b20b52f5fd5b42a227e394e673c8071118f",
+                "url": "https://api.github.com/repos/symfony/process/zipball/57e52a0a6a80ea0aec4fc1b785a7920a95cb88a8",
+                "reference": "57e52a0a6a80ea0aec4fc1b785a7920a95cb88a8",
                 "shasum": ""
             },
             "require": {
@@ -645,7 +642,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-04 12:20:59"
+            "time": "2017-07-03T08:04:30+00:00"
         }
     ],
     "aliases": [],
