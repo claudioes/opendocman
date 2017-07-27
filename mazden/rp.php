@@ -1,69 +1,67 @@
 <?php
 require_once('../config.php');
 
-// PDO
+$dbPrefix = $GLOBALS['CONFIG']['db_prefix'];
 
-$dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8";
-$pdo = new PDO($dsn, DB_USER, DB_PASS);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$pdo = new PDO("mysql:host=". DB_HOST .";dbname=". DB_NAME ."",
+    DB_USER,
+    DB_PASS, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+    ]
+);
 
-// Configuración
-
-$sth = $pdo->prepare("
+$sourceFolder = $pdo->query("
     SELECT value
-    FROM {$GLOBALS['CONFIG']['db_prefix']}settings
+    FROM {$dbPrefix}settings
     WHERE name = 'dataDir'
     LIMIT 1
-");
-$sth->execute();
-$dataDir = $sth->fetchColumn();
+")->fetchColumn();
 
-// Documentos a ser exportados
-
-$sth = $pdo->prepare("
+$jobs = $pdo->query("
     SELECT *
-    FROM {$GLOBALS['CONFIG']['db_prefix']}export_rp
-");
-$sth->execute();
-$jobs = $sth->fetchAll(\PDO::FETCH_ASSOC);
+    FROM {$dbPrefix}export_rp
+")->fetchAll(\PDO::FETCH_ASSOC);
 
-// Empiezo a exportar
+echo "<h1>Exportación de documentos de ODM a Mazden</h1>";
 
-$okFiles = [];
+if (!count($jobs)) {
+    echo "<h3>Nada para exportar</h3>";
+    die();
+}
+
+$copiedFiles = [];
 
 foreach($jobs as $job) {
-    // Documento de ODM
-    $file = $dataDir . $job['data_id'] . '.dat';
+    $sourceFile = "$sourceFolder/{$job['data_id']}.dat";
 
-    // Existe el archivo?
+    if (file_exists($sourceFile)) {
+        $destinationFile = MAZDEN_DOC_FOLDER . '/' . str_replace('\\', '/', $job['destination']);
+        $destinationFolder = dirname($destinationFile);
 
-    if (file_exists($file)) {
-        $destination = MAZDEN_DOC_FOLDER . str_replace('\\', '/', $job['destination']);
-        $destinationFolder = dirname($destination);
-
-        // Trato de copiarlo
-
-        try {
-            // Existe la carpeta de destino? La creo si no
-
-            if (!is_dir($destinationFolder)) {
-                mkdir($destinationFolder, 0777, true);
+        if (!is_dir($destinationFolder) && !mkdir($destinationFolder, 0777, true)) {
+            echo "<p style=\"color: red;\">JOB ID {$job['id']} >> ERROR: No se pudo crear la carpeta '{$destinationFolder}'</p>";
+        } else {
+            if (copy($sourceFile, $destinationFile)) {
+                echo "<p>JOB ID {$job['id']} >> <span style=\"color: green; font-weight: bold;\">OK</span></p>";
+                $copiedFiles[] = $job['id'];
+            } else {
+                echo "<p style=\"color: red;\">JOB ID {$job['id']} >> ERROR: No se pudo copiar el archivo '{$destinationFile}'</p>";
             }
-
-            // Copio el archivo
-
-            copy($file, $destination);
-            $okFiles[] = $job['id'];
-            echo 'JOB ID ' . $job['id'] . ' >> OK<br>';
-        } catch (\Exception $e) {
-            echo 'JOB ID ' . $job['id'] . ' >> Error: ' . $e->getMessage() . '<br>';
         }
+    } else {
+        echo "<p style=\"color: red;\">JOB ID {$job['id']} >> ERROR: No existe el archivo '{$sourceFile}'</p>";
     }
 }
 
-if (count($okFiles)) {
-    $pdo->exec("DELETE FROM {$GLOBALS['CONFIG']['db_prefix']}export_rp WHERE id IN (" . join(',', $okFiles) . ")");
-    echo "<strong>DOCUMENTOS EXPORTADOS</strong>";
+if (count($copiedFiles)) {
+    $pdo->exec("
+        DELETE FROM
+        {$dbPrefix}export_rp
+        WHERE id IN (" . join(',', $copiedFiles) . ")"
+    );
+
+    echo "<h4>". count($copiedFiles) ." documentos exportados</h4>";
 }
 
-echo "<strong>FINALIZADO</strong>";
+echo "<h3>Finalizado!</h3>";
